@@ -1,0 +1,51 @@
+{
+  "name": "slimevents",
+  "version": "0.1.2",
+  "description": "A lightweight event emitter with batch event listening support (zero dependencies)",
+  "type": "module",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
+  "browser": "./dist/index.umd.js",
+  "unpkg": "./dist/index.umd.js",
+  "jsdelivr": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && rollup -c",
+    "dev": "rollup -c -w",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "size": "echo 'Gzipped sizes:' && gzip-size dist/index.esm.js dist/index.cjs.js dist/index.umd.js",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "keywords": [
+    "events",
+    "emitter",
+    "lightweight"
+  ],
+  "author": "yangxinyuan",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.9.5",
+    "rollup-plugin-dts": "^6.1.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
