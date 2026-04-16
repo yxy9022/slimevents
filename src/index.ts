@@ -10,32 +10,32 @@ export interface EventMap {
 export interface EventEmitter<Events extends EventMap> {
   on<Event extends keyof Events>(
     event: Event,
-    callback: (...args: Events[Event]) => void
+    callback: (...args: Events[Event]) => void,
   ): Unsubscribe;
 
   once<Event extends keyof Events>(
     event: Event,
-    callback: (...args: Events[Event]) => void
+    callback: (...args: Events[Event]) => void,
   ): Unsubscribe;
 
   emit<Event extends keyof Events>(event: Event, ...args: Events[Event]): void;
 
   onMany<
-    EventMap extends Partial<Record<keyof Events, (...args: any[]) => void>>
+    EventMap extends Partial<Record<keyof Events, (...args: any[]) => void>>,
   >(
-    events: EventMap
+    events: EventMap,
   ): Unsubscribe;
 
   onAll<Event extends keyof Events>(
     eventNames: Event[],
-    callback: (...args: Events[Event]) => void
+    callback: (...args: Events[Event]) => void,
   ): Unsubscribe;
 
   clear(): void;
 }
 
 export function createSlimEvents<
-  Events extends Record<string, unknown[]>
+  Events extends Record<string, unknown[]>,
 >(): EventEmitter<Events> {
   // 使用映射类型存储
   const listeners: {
@@ -45,7 +45,7 @@ export function createSlimEvents<
   return {
     on<Event extends keyof Events>(
       event: Event,
-      callback: EventCallback<Events[Event]>
+      callback: EventCallback<Events[Event]>,
     ): Unsubscribe {
       (listeners[event] ||= []).push(callback);
 
@@ -61,23 +61,25 @@ export function createSlimEvents<
 
     once<Event extends keyof Events>(
       event: Event,
-      callback: EventCallback<Events[Event]>
+      callback: EventCallback<Events[Event]>,
     ): Unsubscribe {
-      const wrappedCallback: EventCallback<Events[Event]> = (...args) => {
-        unsubscribe();
-        callback(...args);
-      };
-
-      (listeners[event] ||= []).push(wrappedCallback);
+      let wrappedCallback: EventCallback<Events[Event]>;
 
       const unsubscribe = () => {
         const arr = listeners[event];
-        if (arr) {
+        if (arr && wrappedCallback) {
           const idx = arr.indexOf(wrappedCallback);
           if (idx > -1) arr.splice(idx, 1);
           if (arr.length === 0) delete listeners[event];
         }
       };
+
+      wrappedCallback = (...args) => {
+        unsubscribe();
+        callback(...args);
+      };
+
+      (listeners[event] ||= []).push(wrappedCallback);
 
       return unsubscribe;
     },
